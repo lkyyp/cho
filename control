@@ -1,5 +1,5 @@
-Package: com.alex.headsetplay
-Name: 蓝牙耳机续播（播放诊断版）
+Package: com.axs.headsetplay
+Name: 蓝牙耳机续播
 Version: 5.2.0.88
 Architecture: iphoneos-arm
 Description: 蓝牙耳机连接后自动打开所选音乐 App 并继续播放
