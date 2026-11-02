@@ -22,8 +22,8 @@ static void axs_headsetplay_diag(NSString *format, ...) {
 static const NSTimeInterval kAxsHeadsetPlayCooldown = 4.0;
 static const int64_t kAxsHeadsetPlayConnectDelayNs = (int64_t)(5.8 * NSEC_PER_SEC);
 static const int64_t kAxsHeadsetPlayRouteWaitNs = (int64_t)(1.0 * NSEC_PER_SEC);
-static const NSTimeInterval kAxsHeadsetPlayRetryDelays[] = {1.6, 3.2};
-enum { kAxsHeadsetPlayRetryCount = 2 };
+static const NSTimeInterval kAxsHeadsetPlayRetryDelays[] = {1.6, 3.2, 5.0, 7.0};
+enum { kAxsHeadsetPlayRetryCount = 4 };
 enum { kAxsHeadsetPlayMRPlay = 0 };
 
 static os_unfair_lock gAxsHeadsetPlayLock = OS_UNFAIR_LOCK_INIT;
