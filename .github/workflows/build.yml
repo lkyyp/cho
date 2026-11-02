@@ -1,0 +1,55 @@
+name: Build HeadsetPlay playback diagnostic
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+  THEOS: ${{ github.workspace }}/theos-roothide
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup environment
+        run: |
+          echo "$THEOS/bin" >> "$GITHUB_PATH"
+          echo "THEOS=$THEOS" >> "$GITHUB_ENV"
+          echo "THEOS_IGNORE_PARALLEL_BUILDING_NOTICE=yes" >> "$HOME/.theosrc"
+      - name: Checkout Theos
+        uses: actions/checkout@v4
+        with:
+          repository: roothide/theos
+          path: theos-roothide
+          submodules: recursive
+      - name: Install iOS 16.5 SDK
+        run: |
+          set -euo pipefail
+          mkdir -p "$THEOS/sdks"
+          SDK_STAGE="$(mktemp -d)"
+          trap 'rm -rf "$SDK_STAGE"' EXIT
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/theos/sdks.git "$SDK_STAGE/sdks"
+          git -C "$SDK_STAGE/sdks" sparse-checkout set iPhoneOS16.5.sdk
+          cp -R "$SDK_STAGE/sdks/iPhoneOS16.5.sdk" "$THEOS/sdks/"
+      - name: Install dependencies
+        run: |
+          brew install ldid dpkg xz
+          echo "$(brew --prefix)/bin" >> "$GITHUB_PATH"
+      - name: Build rootless
+        run: sh build.sh rootless
+      - name: Upload diagnostic package
+        uses: actions/upload-artifact@v4
+        with:
+          name: headsetplay-10-diag1-rootless
+          path: ./packages/*.deb
+          if-no-files-found: error
